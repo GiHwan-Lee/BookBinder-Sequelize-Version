@@ -1,6 +1,6 @@
 import SQ from "sequelize";
 import { sequelize } from "../db/database.js";
-import { Categories } from "./categoryModel.js";
+import { Category } from "./categoryModel.js";
 
 const DataTypes = SQ.DataTypes;
 const Sequelize = SQ.Sequelize;
@@ -42,21 +42,35 @@ export const Books = sequelize.define(
     categoryId: {
       type: DataTypes.INTEGER,
       references: {
-        model: Categories,
+        model: Category,
         key: "id",
       },
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: SQ.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: SQ.NOW,
-      onUpdate: SQ.NOW,
     },
   },
   {
     timestamps: true,
   }
 );
+
+export async function getAllBooks() {
+  const { count, rows } = await Books.findAndCountAll();
+  return {
+    total: count,
+    products: rows,
+  };
+}
+
+export async function createBook(bookData) {
+  const newBook = await Books.create(bookData);
+  return newBook.id;
+}
+
+export async function getByCategory(categoryId) {
+  const { count, rows } = await Books.findAndCountAll({
+    where: { categoryId },
+  });
+  return {
+    total: count,
+    books: rows,
+  };
+}

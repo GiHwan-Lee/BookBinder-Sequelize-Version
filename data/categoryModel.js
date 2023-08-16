@@ -3,8 +3,8 @@ import { sequelize } from "../db/database.js";
 
 const DataTypes = SQ.DataTypes;
 
-export const Categories = sequelize.define(
-  "categories",
+export const Category = sequelize.define(
+  "category",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -17,15 +17,6 @@ export const Categories = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: SQ.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: SQ.NOW,
-      onUpdate: SQ.NOW,
-    },
   },
   {
     timestamps: true,
@@ -33,9 +24,10 @@ export const Categories = sequelize.define(
 );
 
 export async function getCategoryByName(categoryName) {
-  return Categories.findOne({ where: { categoryName } });
+  return Category.findOne({ where: { categoryName } });
 }
 
 export async function createCategory(categoryName) {
-  return Categories.create(categoryName).then((data) => data.dataValues.id);
+  const newCategory = await Category.create({ categoryName });
+  return { id: newCategory.dataValues.id, categoryName };
 }
